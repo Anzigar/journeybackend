@@ -1,17 +1,18 @@
-from flask_bcrypt import Bcrypt
-from config import db
-import uuid
 from datetime import datetime
-from sqlalchemy.orm import  backref
-# from sqlalchemy.dialects.postgresql import JSON
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import backref
+import uuid
+
+db = SQLAlchemy()
 
 def generate_uuid():
     return str(uuid.uuid4())
 
 #many to many relation ship between user and video
-user_video = db.Table('user_video',
-             db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
-              db.Column('video_id', db.Integer, db.ForeignKey('videos.id')))
+user_video = db.Table(
+    'user_video',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('video_id', db.Integer, db.ForeignKey('videos.id')))
 
 # user_streaks = db.Table('user_streak',
 #                 db.Column('user_ids', db.Integer, db.Foreignkey('users.id')),
