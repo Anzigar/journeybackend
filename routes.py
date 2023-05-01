@@ -1,4 +1,4 @@
-from flask import jsonify, request, session, Blueprint, g
+from flask import app, jsonify, request, session, Blueprint, g
 from flask_login import login_required
 from marshmallow import ValidationError
 from flask_restful import Api, Resource
@@ -10,7 +10,10 @@ from flask_jwt_extended import create_access_token
 import jwt
 import string
 import random
+import os
+from werkzeug.utils import secure_filename
 
+ALLOWED_EXTENSIONS = {'zip', 'rar', 'tar.gz'}
 USER_NOT_FOUND = "User not found."
 WORKOUT_NOT_FOUND = "Workout not found."
 PAYMENT_NOT_FOUND = "Payment not found."
@@ -47,7 +50,24 @@ streaks_schema = StreaksSchema(many=True)
 api_bp = Blueprint('api', __name__,url_prefix='/api')
 api = Api(api_bp)
 
+def allowed_file(filename):
+	return '_' in filename and \
+			filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
 
+@api.resource("/upload")
+class Upload(Resource):
+	def post(self):
+		if 'file' not in request.files:
+			return {"message": "No file found"}, 400
+		file = request.files['file']
+		if file.filename == '':
+			return {"message": "No file found"}, 400
+		if file and allowed_file(file.filename):
+			filename = secure_filename(file.filename)
+			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+			return {"message": "File uploaded successfully"}, 200
+		return {"message": "Invalid file format"}, 400
+	
 @api.resource("/users", "/users/<int:id>")
 class UsersList(Resource):
 	def get(self):
