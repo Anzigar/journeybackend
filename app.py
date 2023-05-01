@@ -11,9 +11,8 @@ app = Flask(__name__)
 app.config.from_pyfile('config.py')
 app.config['SECRET_KEY'] = 'your-secret-key'  # set a secret key for the app
 app.config['JWT_SECRET_KEY'] = ''
-UPLOAD_FOLDER = 'static/uploads/'
+UPLOAD_FOLDER = '/path/to/upload/folder'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 jwt = JWTManager(app)
 app.register_blueprint(api_bp)
 login_manager = LoginManager()
